@@ -1,7 +1,24 @@
 ﻿using ApiPersonajesAWS.Data;
 using ApiPersonajesAWS.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-
+using MySqlConnector;
+#region PROCEDURES
+//DELIMITER $$
+//DROP PROCEDURE IF EXISTS UpdatePersonaje;
+//create procedure UpdatePersonaje
+//(
+//IN param_idpersonaje INT,
+//IN param_nombre NVARCHAR(60),
+//IN param_imagen NVARCHAR(250)
+//)
+//begin
+//	update PERSONAJES
+//    set PERSONAJE = param_nombre, IMAGEN = param_imagen
+//    where IDPERSONAJE = param_idpersonaje;
+//end $$
+//DELIMITER ;
+#endregion
 namespace ApiPersonajesAWS.Repositories
 {
     public class RepositoryPersonajes
@@ -39,6 +56,15 @@ namespace ApiPersonajesAWS.Repositories
             this.context.Personajes.Add(personaje);
             await this.context.SaveChangesAsync();
             return personaje;
+        }
+
+        public async Task UpdatePersonajeAsync(int idpersonaje,string nombre, string imagen)
+        {
+            string sql = "CALL UpdatePersonaje(@param_idpersonaje, @param_nombre, @param_imagen);";
+            MySqlParameter paramidpersonaje = new MySqlParameter("@param_idpersonaje", idpersonaje);
+            MySqlParameter paramnombre = new MySqlParameter("@param_nombre", nombre);
+            MySqlParameter paramimagen = new MySqlParameter("@param_imagen", imagen);
+            await context.Database.ExecuteSqlRawAsync(sql, paramidpersonaje, paramnombre, paramimagen);
         }
     }
 }
